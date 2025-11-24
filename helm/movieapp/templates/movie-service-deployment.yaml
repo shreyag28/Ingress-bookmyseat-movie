@@ -14,11 +14,14 @@ spec:
       labels:
         app: {{ .Values.movieService.name }}
     spec:
+      {{- if and .Values.mysql.enabled (not .Values.rds.enabled) }}
+      # Only include init container if using Kubernetes MySQL
       initContainers:
         - name: wait-for-mysql
           image: {{ .Values.mysql.image.repository }}:{{ .Values.mysql.image.tag }}
           command:
             ["sh", "-c", "until mysql -h {{ .Values.mysql.name }} -u {{ .Values.mysql.user }} -p{{ .Values.mysql.password }} -e 'SELECT 1' >/dev/null 2>&1; do echo waiting for {{ .Values.mysql.name }}; sleep 5; done"]
+      {{- end }}
       containers:
         - name: {{ .Values.movieService.name }}
           image: {{ .Values.movieService.image.repository }}:{{ .Values.movieService.image.tag }}
@@ -27,12 +30,29 @@ spec:
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: {{ .Values.movieService.env.springProfilesActive }}
+            {{- if .Values.rds.enabled }}
+            # RDS Configuration - Uses Kubernetes secret for credentials
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:mysql://{{ .Values.rds.endpoint }}:{{ .Values.rds.port }}/{{ .Values.rds.database }}
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.rds.secretName }}
+                  key: username
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.rds.secretName }}
+                  key: password
+            {{- else }}
+            # Kubernetes MySQL Configuration
             - name: SPRING_DATASOURCE_URL
               value: {{ .Values.movieService.env.springDatasourceUrl }}
             - name: SPRING_DATASOURCE_USERNAME
               value: {{ .Values.movieService.env.springDatasourceUsername }}
             - name: SPRING_DATASOURCE_PASSWORD
               value: {{ .Values.movieService.env.springDatasourcePassword }}
+            {{- end }}
             - name: ZIPKIN_ENDPOINT
               value: {{ .Values.movieService.env.zipkinEndpoint }}
 {{- end }}

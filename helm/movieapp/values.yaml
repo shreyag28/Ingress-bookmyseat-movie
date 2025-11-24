@@ -12,9 +12,21 @@ storageClass:
   volumeBindingMode: Immediate
   reclaimPolicy: Delete
 
-# MySQL Database configuration
+# RDS Database configuration
+rds:
+  enabled: true  # Set to true to use RDS instead of Kubernetes MySQL
+  endpoint: "movie-db-shweta.clbdj44v7c4x.us-east-1.rds.amazonaws.com"  # e.g., movie-db-rds.xxxxx.us-east-1.rds.amazonaws.com
+  port: 3306
+  database: movie_db
+  # Kubernetes secret configuration
+  secretName: movie-db-credentials  # Kubernetes secret name (must contain: username, password)
+  secret:
+    username: movieuser  # RDS database username
+    password: "moviepass"  # RDS database password - Set this value
+
+# MySQL Database configuration (Kubernetes deployment)
 mysql:
-  enabled: true
+  enabled: false  # Set to false when using RDS
   name: movie-db
   image:
     repository: mysql
@@ -49,6 +61,7 @@ movieService:
   port: 8081
   env:
     springProfilesActive: docker
+    # These values are used when mysql.enabled=true
     springDatasourceUrl: jdbc:mysql://movie-db:3306/movie_db
     springDatasourceUsername: movieuser
     springDatasourcePassword: moviepass
