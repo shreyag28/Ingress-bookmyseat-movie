@@ -54,7 +54,7 @@ movieService:
     springDatasourcePassword: moviepass
     zipkinEndpoint: http://zipkin:9411/api/v2/spans
   service:
-    type: Loadbalancer
+    type: LoadBalancer
     port: 8081
     targetPort: 8081
 
