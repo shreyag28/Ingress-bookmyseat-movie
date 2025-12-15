@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @CrossOrigin(
         origins = {
-                "https://main.d20avnkha3gw9q.amplifyapp.com",
+                "https://*.amplifyapp.com",
                 "https://bookmyseat.dockeroncloud.com"
         },
         allowedHeaders = "*",
