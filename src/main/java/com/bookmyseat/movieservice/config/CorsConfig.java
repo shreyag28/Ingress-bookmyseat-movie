@@ -16,7 +16,7 @@ public class CorsConfig {
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
 
-        // Allow frontend origins
+        // Allow frontend origins - using patterns for wildcard support
         config.setAllowedOriginPatterns(Arrays.asList(
             "http://localhost:*",
             "http://127.0.0.1:*",
@@ -32,8 +32,9 @@ public class CorsConfig {
         // Allow all headers
         config.setAllowedHeaders(List.of("*"));
 
-        // Allow credentials
-        config.setAllowCredentials(true);
+        // IMPORTANT: When using wildcard patterns, set credentials to false
+        // OR use specific origins if you need credentials
+        config.setAllowCredentials(false);
 
         // Max age for preflight cache
         config.setMaxAge(3600L);
