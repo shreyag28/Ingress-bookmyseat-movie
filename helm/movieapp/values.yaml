@@ -63,7 +63,7 @@ ingress:
   enabled: true
   name: movieapp-ingress
   host: bookmyseat.dockeroncloud.com
-  path: /api
+  path: /
   pathType: Prefix
   className: nginx  # Change this to match your ingress controller (nginx, traefik, etc.)
   annotations:
