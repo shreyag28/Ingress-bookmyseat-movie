@@ -4,32 +4,30 @@ kind: Ingress
 metadata:
   name: {{ .Values.ingress.name }}
   namespace: {{ .Values.namespace.name }}
-  {{- with .Values.ingress.annotations }}
   annotations:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
+    kubernetes.io/ingress.class: alb  # Legacy fallback (className is preferred)
+    {{- range $key, $value := .Values.ingress.annotations }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
 spec:
-  {{- if .Values.ingress.className }}
   ingressClassName: {{ .Values.ingress.className }}
+  {{- if .Values.ingress.tls.enabled }}
+  tls:
+    - hosts:
+        - {{ .Values.ingress.host }}
+      secretName: bookmyseat-tls-secret  # Optional if using ACM (ALB terminates TLS)
   {{- end }}
   rules:
     - host: {{ .Values.ingress.host }}
       http:
         paths:
-          - path: {{ .Values.ingress.path }}
-            pathType: {{ .Values.ingress.pathType }}
+          {{- range .Values.ingress.paths }}
+          - path: {{ .path }}
+            pathType: {{ .pathType }}
             backend:
               service:
-                name: {{ .Values.movieService.name }}
+                name: {{ .serviceName }}
                 port:
-                  number: {{ .Values.movieService.service.port }}
-  {{- if .Values.ingress.tls }}
-  tls:
-    {{- range .Values.ingress.tls }}
-    - hosts:
-        - {{ .host }}
-      secretName: {{ .secretName }}
-    {{- end }}
-  {{- end }}
+                  number: {{ .servicePort }}
+          {{- end }}
 {{- end }}
-
