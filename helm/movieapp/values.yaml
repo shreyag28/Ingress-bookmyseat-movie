@@ -74,8 +74,8 @@ ingress:
     nginx.ingress.kubernetes.io/use-regex: "true"
   tls:
     # Uncomment and configure if you want TLS/HTTPS
-    # - host: bookmyseat.dockeroncloud.com
-    #   secretName: bookmyseat-tls-secret
+     - host: bookmyseat.dockeroncloud.com
+       secretName: bookmyseat-tls-secret
 
 # ConfigMap for database initialization scripts
 initScripts:
