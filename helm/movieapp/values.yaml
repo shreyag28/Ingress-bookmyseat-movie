@@ -63,19 +63,32 @@ ingress:
   enabled: true
   name: movieapp-ingress
   host: bookmyseat
-  path: /
+  #path: /
   pathType: Prefix
-  className: nginx  # Change this to match your ingress controller (nginx, traefik, etc.)
+  className: alb  # Change this to match your ingress controller (nginx, traefik, etc.)
   annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip  # Direct to pods (efficient on EKS)
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80},{"HTTPS":443}]'
+    alb.ingress.kubernetes.io/ssl-redirect: "443"  # Redirect HTTP -> HTTPS
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-1:543816070942:certificate/3aef524d-818c-48e8-bc63-7641b73b95de  # Your ACM cert ARN
+    alb.ingress.kubernetes.io/healthcheck-path: /actuator/health  # Adjust if your Spring Boot apps have a health endpoint (common: /actuator/health)
+  paths:
+    - path: /api/v1/movies
+      pathType: Prefix
+      serviceName: movie-service
+      servicePort: 8081  
+    
+    # Optional: WAF, security groups, etc.
     # Add any annotations you need for your ingress controller
     # For nginx ingress controller, you might want:
     # nginx.ingress.kubernetes.io/rewrite-target: /
-    nginx.ingress.kubernetes.io/rewrite-target: /api/$2
-    nginx.ingress.kubernetes.io/use-regex: "true"
+    #nginx.ingress.kubernetes.io/rewrite-target: /api/$2
+    #nginx.ingress.kubernetes.io/use-regex: "true"
   tls:
+    enabled: true
     # Uncomment and configure if you want TLS/HTTPS
-     - host: bookmyseat.dockeroncloud.com
-       secretName: bookmyseat-tls-secret
+    hosts: bookmyseat.dockeroncloud.com
 
 # ConfigMap for database initialization scripts
 initScripts:
