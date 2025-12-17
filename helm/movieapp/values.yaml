@@ -44,7 +44,7 @@ movieService:
   name: movie-service
   image:
     repository: 543816070942.dkr.ecr.us-east-1.amazonaws.com/movieapp-backend
-    tag: "34"    #previous working tag 29 33-for ingress
+    tag: "35"    #previous working tag 29 33-for ingress
   replicas: 1
   port: 8081
   env:
