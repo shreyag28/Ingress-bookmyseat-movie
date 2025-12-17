@@ -22,8 +22,9 @@ public class CorsConfig {
             "http://127.0.0.1:*",
             "http://[::1]:*",
             "http://*:4200",
-            "https://*.amplifyapp.com",  // AWS Amplify default domain pattern
-            "https://main.d20avnkha3gw9q.amplifyapp.com"  // Your specific Amplify domain
+            // AWS Amplify default domain pattern
+            "https://main.d20avnkha3gw9q.amplifyapp.com",  // Your specific Amplify domain
+            "https://bookmyseat.dockeroncloud.com"
         ));
 
         // Allow all HTTP methods
@@ -32,9 +33,8 @@ public class CorsConfig {
         // Allow all headers
         config.setAllowedHeaders(List.of("*"));
 
-        // IMPORTANT: When using wildcard patterns, set credentials to false
-        // OR use specific origins if you need credentials
-        config.setAllowCredentials(false);
+        // Needed for cookie / auth header based calls from the UI
+        config.setAllowCredentials(true);
 
         // Max age for preflight cache
         config.setMaxAge(3600L);
